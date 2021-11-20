@@ -6,8 +6,9 @@ import (
 )
 
 func (pg *PostgresDB) CreateTask(task model.Task) error {
-	row := pg.db.QueryRow("INSERT INTO tasks (user_id, name, description, start_date, end_date) VALUES ($1, $2, $3, $4, $5) RETURNING id ",
-		task.UserId, task.Name, task.Description, task.StartDate, task.EndDate)
+	row := pg.db.QueryRow("INSERT INTO tasks (user_id, name, description, start_date, end_date, xp) "+
+		"VALUES ($1, $2, $3, $4, $5, $6) RETURNING id ",
+		task.UserId, task.Name, task.Description, task.StartDate, task.EndDate, task.Xp)
 
 	if err := row.Scan(&task.Id); err != nil {
 		return err
@@ -41,7 +42,7 @@ func (pg *PostgresDB) GetUserTasks(userId int) ([]model.Task, error) {
 		var task model.Task
 
 		if err := rows.Scan(&task.Id, &task.UserId, &task.Name, &task.Description, &task.EndDate, &task.StartDate); err != nil {
-			return tasks, nil
+			return nil, err
 		}
 
 		tasks = append(tasks, task)

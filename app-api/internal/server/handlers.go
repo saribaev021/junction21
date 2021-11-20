@@ -33,6 +33,10 @@ type createTaskDecoder struct {
 	StartDate   string `json:"Start_date"`
 }
 
+func (s *Server) xpCalculator(startDate time.Time, endDate time.Time) int {
+	return int(endDate.Sub(startDate).Hours()/24) * 100
+}
+
 func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Request) {
 	data := createTaskDecoder{}
 
@@ -64,12 +68,13 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 
 	newTask.Name = data.Name
 	newTask.Description = data.Description
+	newTask.Xp = s.xpCalculator(newTask.StartDate, newTask.EndDate)
 	if err := s.dbHandler.CreateTask(*newTask); err != nil {
 		s.errorLog(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
+	writer.Write([]byte("task created"))
 }
 
 func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Request) {
@@ -111,5 +116,4 @@ func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Reque
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
-	writer.WriteHeader(http.StatusOK)
 }
