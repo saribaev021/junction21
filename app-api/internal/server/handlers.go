@@ -15,6 +15,11 @@ const (
 	dateFormat     = "2006-01-02 15:04:05 -0700"
 )
 
+func (s *Server) errorLog(writer http.ResponseWriter, error string, code int) {
+	http.Error(writer, error, code)
+	log.Printf(error)
+}
+
 func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Request) {
 	data := struct {
 		Name        string `json:"Name"`
@@ -25,8 +30,7 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 	}{}
 
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
-		http.Error(writer, fmt.Sprintf(serializeError, err), http.StatusBadRequest)
-		log.Printf(serializeError, err)
+		s.errorLog(writer, fmt.Sprintf(serializeError, err), http.StatusBadRequest)
 		return
 	}
 	log.Printf("incoming task: %v", data)
@@ -36,29 +40,25 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 
 	newTask.UserId, err = s.dbHandler.GetUserIdByName(data.UserName)
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
-		log.Printf(dbError, err)
+		s.errorLog(writer, fmt.Sprintf(serializeError, err), http.StatusBadRequest)
 		return
 	}
 
 	newTask.EndDate, err = time.Parse(dateFormat, data.EndDate)
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("end date parse error: %s", err.Error()), http.StatusInternalServerError)
-		log.Printf("end date parse error: %v", err)
+		s.errorLog(writer, fmt.Sprintf("end date parse error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 	newTask.StartDate, err = time.Parse(dateFormat, data.StartDate)
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("start date parce error: %s", err.Error()), http.StatusInternalServerError)
-		log.Printf("start date parce error: %v", err)
+		s.errorLog(writer, fmt.Sprintf("start date parce error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
 	newTask.Name = data.Name
 	newTask.Description = data.Description
 	if err := s.dbHandler.CreateTask(*newTask); err != nil {
-		http.Error(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
-		log.Printf(dbError, err)
+		s.errorLog(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
@@ -71,28 +71,24 @@ func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Reque
 	name := queryValues.Get("name")
 	log.Printf("query name: %s", name)
 	if name == "" {
-		http.Error(writer, fmt.Sprintf("empty name"), http.StatusBadRequest)
-		log.Println("empty name")
+		s.errorLog(writer, fmt.Sprintf("empty name"), http.StatusBadRequest)
 		return
 	}
 
 	userId, err := s.dbHandler.GetUserIdByName(name)
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("db error: %s", err.Error()), http.StatusBadRequest)
-		log.Printf(dbError, err)
+		s.errorLog(writer, fmt.Sprintf("db error: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 
 	tasks, err := s.dbHandler.GetUserTasks(userId)
 	if err != nil {
-		http.Error(writer, fmt.Sprintf("db error: %s", err.Error()), http.StatusBadRequest)
-		log.Printf(dbError, err)
+		s.errorLog(writer, fmt.Sprintf("db error: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 
 	if err := json.NewEncoder(writer).Encode(tasks); err != nil {
-		http.Error(writer, fmt.Sprintf("serialize error: %s", err.Error()), http.StatusInternalServerError)
-		log.Printf(serializeError, err)
+		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
