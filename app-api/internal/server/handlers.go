@@ -18,6 +18,13 @@ func (s *Server) errorLog(writer http.ResponseWriter, error string, code int) {
 	log.Printf(error)
 }
 
+type encoder struct {
+	Name        string `json:"Name"`
+	StartDate   string `json:"Start_date"`
+	EndDate     string `json:"End_date"`
+	Description string `json:"Description"`
+}
+
 func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Request) {
 	data := struct {
 		Name        string `json:"Name"`
@@ -85,7 +92,18 @@ func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	if err := json.NewEncoder(writer).Encode(tasks); err != nil {
+	jsons := make([]encoder, len(tasks))
+
+	for i, task := range tasks {
+		jsons[i] = encoder{
+			Name:        task.Name,
+			EndDate:     task.EndDate.Format(dateFormat),
+			StartDate:   task.StartDate.Format(dateFormat),
+			Description: task.Description,
+		}
+	}
+
+	if err := json.NewEncoder(writer).Encode(jsons); err != nil {
 		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
