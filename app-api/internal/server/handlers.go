@@ -10,9 +10,7 @@ import (
 )
 
 const (
-	serializeError = "serialize error: %s"
-	dbError        = "database error: %s"
-	dateFormat     = "2006-01-02 15:04:05 -0700"
+	dateFormat = "2006-01-02 15:04:05 -0700"
 )
 
 func (s *Server) errorLog(writer http.ResponseWriter, error string, code int) {
@@ -30,7 +28,7 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 	}{}
 
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
-		s.errorLog(writer, fmt.Sprintf(serializeError, err), http.StatusBadRequest)
+		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err), http.StatusBadRequest)
 		return
 	}
 	log.Printf("incoming task: %v", data)
@@ -40,7 +38,7 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 
 	newTask.UserId, err = s.dbHandler.GetUserIdByName(data.UserName)
 	if err != nil {
-		s.errorLog(writer, fmt.Sprintf(serializeError, err), http.StatusBadRequest)
+		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err), http.StatusBadRequest)
 		return
 	}
 

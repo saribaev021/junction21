@@ -4,10 +4,10 @@ import "time"
 
 type Task struct {
 	Id          int
-	Name        string
-	StartDate   time.Time
-	EndDate     time.Time
-	Description string
+	Name        string    `json:"Name"`
+	StartDate   time.Time `json:"Start_date"`
+	EndDate     time.Time `json:"End_date"`
+	Description string    `json:"Description"`
 	UserId      int
 }
 
