@@ -18,21 +18,23 @@ func (s *Server) errorLog(writer http.ResponseWriter, error string, code int) {
 	log.Printf(error)
 }
 
-type encoder struct {
+type getTasksEncoder struct {
 	Name        string `json:"Name"`
 	StartDate   string `json:"Start_date"`
 	EndDate     string `json:"End_date"`
 	Description string `json:"Description"`
 }
 
+type createTaskDecoder struct {
+	Name        string `json:"Name"`
+	Description string `json:"Description"`
+	EndDate     string `json:"End_date"`
+	UserName    string `json:"User_name"`
+	StartDate   string `json:"Start_date"`
+}
+
 func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Request) {
-	data := struct {
-		Name        string `json:"Name"`
-		Description string `json:"Description"`
-		EndDate     string `json:"End_date"`
-		UserName    string `json:"User_name"`
-		StartDate   string `json:"Start_date"`
-	}{}
+	data := createTaskDecoder{}
 
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
 		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err), http.StatusBadRequest)
@@ -92,10 +94,10 @@ func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	jsons := make([]encoder, len(tasks))
+	jsons := make([]getTasksEncoder, len(tasks))
 
 	for i, task := range tasks {
-		jsons[i] = encoder{
+		jsons[i] = getTasksEncoder{
 			Name:        task.Name,
 			EndDate:     task.EndDate.Format(dateFormat),
 			StartDate:   task.StartDate.Format(dateFormat),
