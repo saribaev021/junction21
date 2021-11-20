@@ -16,11 +16,11 @@ var (
 
 func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Request) {
 	data := struct {
-		Name        string    `json:"Name"`
-		Description string    `json:"Description"`
-		EndDate     time.Time `json:"End_date"`
-		UserName    string    `json:"User_name"`
-		StartDate   time.Time `json:"Start_date"`
+		Name        string `json:"Name"`
+		Description string `json:"Description"`
+		EndDate     string `json:"End_date"`
+		UserName    string `json:"User_name"`
+		StartDate   string `json:"Start_date"`
 	}{}
 
 	if err := json.NewDecoder(request.Body).Decode(&data); err != nil {
@@ -40,10 +40,21 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
+	newTask.EndDate, err = time.Parse("2006-01-02", data.EndDate)
+	if err != nil {
+		http.Error(writer, fmt.Sprintf("end date parse error: %s", err.Error()), http.StatusInternalServerError)
+		log.Printf("end date parse error: %v", err)
+		return
+	}
+	newTask.StartDate, err = time.Parse("2006-01-02", data.StartDate)
+	if err != nil {
+		http.Error(writer, fmt.Sprintf("start date parce error: %s", err.Error()), http.StatusInternalServerError)
+		log.Printf("start date parce error: %v", err)
+		return
+	}
+
 	newTask.Name = data.Name
-	newTask.EndDate = data.EndDate
 	newTask.Description = data.Description
-	newTask.StartDate = data.StartDate
 	if err := s.dbHandler.CreateTask(*newTask); err != nil {
 		http.Error(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
 		log.Printf(dbError, err)
@@ -85,4 +96,5 @@ func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Reque
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(http.StatusOK)
 }
