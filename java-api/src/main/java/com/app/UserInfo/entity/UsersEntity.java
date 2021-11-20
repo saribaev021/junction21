@@ -10,13 +10,13 @@ public class UsersEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    private int rating;
+    private double rating;
     private byte[] photo;
 
     public UsersEntity() {
     }
 
-    public UsersEntity(Integer id, String name, int rating, byte[] photo) {
+    public UsersEntity(Integer id, String name, double rating, byte[] photo) {
         this.id = id;
         this.name = name;
         this.rating = rating;
@@ -39,11 +39,11 @@ public class UsersEntity {
         this.name = name;
     }
 
-    public int getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
