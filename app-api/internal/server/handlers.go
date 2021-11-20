@@ -9,9 +9,10 @@ import (
 	"time"
 )
 
-var (
+const (
 	serializeError = "serialize error: %s"
 	dbError        = "database error: %s"
+	dateFormat     = "2006-01-02 15:04:05 -0700"
 )
 
 func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Request) {
@@ -40,13 +41,13 @@ func (s *Server) createTaskHandler(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	newTask.EndDate, err = time.Parse("2006-01-02", data.EndDate)
+	newTask.EndDate, err = time.Parse(dateFormat, data.EndDate)
 	if err != nil {
 		http.Error(writer, fmt.Sprintf("end date parse error: %s", err.Error()), http.StatusInternalServerError)
 		log.Printf("end date parse error: %v", err)
 		return
 	}
-	newTask.StartDate, err = time.Parse("2006-01-02", data.StartDate)
+	newTask.StartDate, err = time.Parse(dateFormat, data.StartDate)
 	if err != nil {
 		http.Error(writer, fmt.Sprintf("start date parce error: %s", err.Error()), http.StatusInternalServerError)
 		log.Printf("start date parce error: %v", err)
