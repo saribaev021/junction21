@@ -9,7 +9,7 @@ import (
 
 var (
 	listenAddr   = flag.String("address", "localhost:8082", "address to listen")
-	databaseAddr = flag.String("database-url", "db", "database address")
+	databaseAddr = flag.String("database-url", "localhost", "database address")
 	databasePort = flag.String("database-port", "5432", "database port")
 )
 

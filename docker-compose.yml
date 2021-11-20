@@ -1,13 +1,5 @@
 version: "3.9"
 services:
-#  kanat_app:
-#    build: ./KanatApp
-#    volumes:
-#     -  ./KanatApp:/go/src/KanatApp
-#    ports:
-#      - "3000:3000"
-#    depends_on:
-#      - db
   app-api:
     build: ./app-api
     volumes:
