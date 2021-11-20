@@ -16,6 +16,16 @@ services:
       - "8082:8082"
     depends_on:
       - db
+  java-api:
+    build:
+      context: .
+      dockerfile: ./java-api/Dockerfile
+    volumes:
+      - ./java-api:/java-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - app-api
   db:
     image: alvistack/postgres-12
     environment:

@@ -31,7 +31,7 @@ func (s *Server) InitSever() {
 	s.router.Post("/create/task", s.createTaskHandler)
 	s.router.Get("/get/tasks", s.getTasksHandler)
 	s.router.Get("/", func(writer http.ResponseWriter, request *http.Request) {
-		log.Print("ruslan")
+		log.Print("ping")
 	})
 }
 
