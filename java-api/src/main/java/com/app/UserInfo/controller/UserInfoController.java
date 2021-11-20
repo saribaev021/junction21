@@ -12,12 +12,12 @@ public class UserInfoController {
     @Autowired
     private UsersRepository usersRepository;
 
-    @GetMapping("/{id}")
-    public ResponseEntity getUserById(@PathVariable String id) {
+    @GetMapping("/{name}")
+    public ResponseEntity getUserByName(@PathVariable String name) {
         try {
-            return ResponseEntity.ok(usersRepository.findById(Integer.parseInt(id)));
+            return ResponseEntity.ok(usersRepository.findByName(name));
         } catch (Exception ex) {
-            return ResponseEntity.badRequest().body("Error");
+            return ResponseEntity.badRequest().body("Error while searching user");
         }
     }
 
@@ -26,7 +26,7 @@ public class UserInfoController {
         try {
             usersRepository.save(usersEntity);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error while saving user: \n" + ex.getMessage());
         }
     }
 }
