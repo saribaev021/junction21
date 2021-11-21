@@ -41,7 +41,7 @@ func (pg *PostgresDB) GetUserTasks(userId int) ([]model.Task, error) {
 	for rows.Next() {
 		var task model.Task
 
-		if err := rows.Scan(&task.Id, &task.UserId, &task.Name, &task.Description, &task.EndDate, &task.StartDate, &task.Xp); err != nil {
+		if err := rows.Scan(&task.Id, &task.UserId, &task.Name, &task.Xp, &task.Description, &task.EndDate, &task.StartDate); err != nil {
 			return nil, err
 		}
 
