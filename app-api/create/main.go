@@ -51,8 +51,7 @@ func main() {
 	query  = "CREATE TABLE IF NOT EXISTS users ( " +
 		"id integer GENERATED ALWAYS AS IDENTITY, " +
 		"name varchar(32) UNIQUE, " +
-		"rating integer, " +
-		"photo bytea, " +
+		"xp integer, " +
 		"PRIMARY KEY(id))"
 	dbQueryHandler(db, query)
 
@@ -60,6 +59,7 @@ func main() {
 		"id integer GENERATED ALWAYS AS IDENTITY, " +
 		"user_id integer, " +
 		"name varchar(32), " +
+		"xp integer, " +
 		"description varchar(32), " +
 		"start_date date, " +
 		"end_date date, " +
