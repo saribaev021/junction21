@@ -17,7 +17,6 @@ type handler interface {
 	DeleteTaskByUser(name string, userId int) error
 }
 
-
 type Server struct {
 	router    *chi.Mux
 	dbHandler handler
@@ -36,6 +35,7 @@ func (s *Server) InitSever() {
 	s.router.Post("/create/task", s.createTaskHandler)
 	s.router.Get("/get/tasks", s.getTasksHandler)
 	s.router.Delete("/delete/task/finished", s.deleteFinishedTask)
+	s.router.Delete("/delete/task/giveup", s.deleteTaskGiveUp)
 
 	s.router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("ping"))

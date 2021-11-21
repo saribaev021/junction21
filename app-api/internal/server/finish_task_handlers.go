@@ -8,43 +8,71 @@ import (
 	"time"
 )
 
+type task struct {
+	Name     string `json:"Name"`
+	UserName string `json:"User_name"`
+}
+
 func (s *Server) deleteFinishedTask(writer http.ResponseWriter, request *http.Request) {
-	task := struct {
-		Name     string `json:"Name"`
-		UserName string `json:"User_name"`
-	}{}
-	if err := json.NewDecoder(request.Body).Decode(&task); err != nil {
+	var taskData task
+
+	if err := json.NewDecoder(request.Body).Decode(&taskData); err != nil {
 		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err), http.StatusBadRequest)
 		return
 	}
 
-	user, err := s.dbHandler.GetUserByName(task.UserName)
+	user, err := s.dbHandler.GetUserByName(taskData.UserName)
 	if err != nil {
-		s.errorLog(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
+		s.errorLog(writer, fmt.Sprintf("database GetUserByName error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
-	modelTask, err := s.dbHandler.GetTaskByUser(user.Id, task.Name)
+	modelTask, err := s.dbHandler.GetTaskByUser(user.Id, taskData.Name)
 	if err != nil {
-		s.errorLog(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
+		s.errorLog(writer, fmt.Sprintf("database GetTaskByUser error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
-	diff := (time.Now().UnixNano() / int64(time.Hour) - modelTask.EndDate.UnixNano() / int64(time.Hour)) / 24
+	diff := (time.Now().UnixNano()/int64(time.Hour) - modelTask.EndDate.UnixNano()/int64(time.Hour)) / 24
 	if diff > 0 {
 		modelTask.Xp -= int(diff * 60)
 	}
 	user.Xp += modelTask.Xp
+	if user.Xp < 0 {
+		user.Xp = 0
+	}
 
 	if err := s.dbHandler.UpdateUserXP(user.Id, user.Xp); err != nil {
-		s.errorLog(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
+		s.errorLog(writer, fmt.Sprintf("database UpdateUserXP error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
 	if err := s.dbHandler.DeleteTaskByUser(modelTask.Name, user.Id); err != nil {
-		s.errorLog(writer, fmt.Sprintf("database error: %s", err.Error()), http.StatusInternalServerError)
+		s.errorLog(writer, fmt.Sprintf("database DeleteTaskByUser error: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("incoming task: %v", task)
+	log.Printf("incoming task: %v", taskData)
+}
+
+func (s *Server) deleteTaskGiveUp(writer http.ResponseWriter, request *http.Request) {
+	var taskData task
+
+	if err := json.NewDecoder(request.Body).Decode(&taskData); err != nil {
+		s.errorLog(writer, fmt.Sprintf("serialize error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	userId, err := s.dbHandler.GetUserIdByName(taskData.UserName)
+	if err != nil {
+		s.errorLog(writer, fmt.Sprintf("database GetUserIdByName error: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	if err := s.dbHandler.DeleteTaskByUser(taskData.Name, userId); err != nil {
+		s.errorLog(writer, fmt.Sprintf("database DeleteTaskByUser error: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("incoming task: %v", taskData)
 }
