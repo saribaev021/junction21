@@ -10,8 +10,13 @@ import (
 type handler interface {
 	CreateTask(model.Task) error
 	GetUserIdByName(string) (int, error)
+	GetUserByName(string) (model.User, error)
 	GetUserTasks(int) ([]model.Task, error)
+	GetTaskByUser(userId int, taskName string) (model.Task, error)
+	UpdateUserXP(userId int, xp int) error
+	DeleteTaskByUser(name string, userId int) error
 }
+
 
 type Server struct {
 	router    *chi.Mux
@@ -30,6 +35,7 @@ func (s *Server) InitSever() {
 
 	s.router.Post("/create/task", s.createTaskHandler)
 	s.router.Get("/get/tasks", s.getTasksHandler)
+	s.router.Delete("/delete/task/finished", s.deleteFinishedTask)
 
 	s.router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("ping"))

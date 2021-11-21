@@ -50,3 +50,38 @@ func (pg *PostgresDB) GetUserTasks(userId int) ([]model.Task, error) {
 
 	return tasks, nil
 }
+
+func (pg *PostgresDB) UpdateUserXP(userId int, xp int) error {
+	row := pg.db.QueryRow("UPDATE users SET xp=($1) WHERE id=$(2)", xp, userId)
+	err := row.Scan()
+
+	return err
+}
+
+func (pg *PostgresDB) GetTaskByUser(userId int, taskName string) (model.Task, error) {
+	row := pg.db.QueryRow("SELECT * FROM junction21.public.tasks WHERE name=($1) AND user_id=($2)", taskName, userId)
+
+	var task model.Task
+	if err := row.Scan(&task.Id, &task.UserId, &task.Name, &task.Description, &task.EndDate, &task.StartDate); err != nil {
+		return model.Task{}, nil
+	}
+
+	return task, nil
+}
+
+func (pg *PostgresDB) DeleteTaskByUser(name string, userId int) error {
+	_, err := pg.db.Exec("DELETE FROM tasks WHERE user_id=($1) AND name=($2)", userId, name)
+
+	return err
+}
+
+func (pg *PostgresDB) GetUserByName(name string) (model.User, error) {
+	row := pg.db.QueryRow("SELECT * FROM junction21.public.users WHERE name=($1)", name)
+
+	var user model.User
+	if err := row.Scan(&user.Id, &user.Name, &user.Xp); err != nil {
+		return model.User{}, err
+	}
+
+	return user, nil
+}
