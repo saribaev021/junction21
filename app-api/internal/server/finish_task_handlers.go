@@ -35,16 +35,15 @@ func (s *Server) deleteFinishedTask(writer http.ResponseWriter, request *http.Re
 
 	diff := (time.Now().UnixNano()/int64(time.Hour) - modelTask.EndDate.UnixNano()/int64(time.Hour)) / 24
 	if diff > 0 {
-		modelTask.Xp -= int(diff * 60)
+		modelTask.Xp -= int(diff * 100)
 	}
 	user.Xp += modelTask.Xp
-	if user.Xp < 0 {
-		user.Xp = 0
-	}
 
-	if err := s.dbHandler.UpdateUserXP(user.Id, user.Xp); err != nil {
-		s.errorLog(writer, fmt.Sprintf("database UpdateUserXP error: %s", err.Error()), http.StatusInternalServerError)
-		return
+	if modelTask.Xp > 0 {
+		if err := s.dbHandler.UpdateUserXP(user.Id, user.Xp); err != nil {
+			s.errorLog(writer, fmt.Sprintf("database UpdateUserXP error: %s", err.Error()), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if err := s.dbHandler.DeleteTaskByUser(modelTask.Name, user.Id); err != nil {
