@@ -64,7 +64,7 @@ func (s *Server) deleteTaskGiveUp(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
-	log.Printf("incoming task: %v", taskData)
+	log.Printf("incoming data: %v", taskData)
 	userId, err := s.dbHandler.GetUserIdByName(taskData.UserName)
 	if err != nil {
 		s.errorLog(writer, fmt.Sprintf("database GetUserIdByName error: %s", err), http.StatusBadRequest)

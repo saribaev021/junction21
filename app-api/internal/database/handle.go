@@ -41,7 +41,7 @@ func (pg *PostgresDB) GetUserTasks(userId int) ([]model.Task, error) {
 	for rows.Next() {
 		var task model.Task
 
-		if err := rows.Scan(&task.Id, &task.UserId, &task.Name, &task.Xp, &task.Description, &task.EndDate, &task.StartDate); err != nil {
+		if err := rows.Scan(&task.Id, &task.UserId, &task.Name, &task.Xp, &task.Description, &task.StartDate, &task.EndDate); err != nil {
 			return nil, err
 		}
 
@@ -61,7 +61,7 @@ func (pg *PostgresDB) GetTaskByUser(userId int, taskName string) (model.Task, er
 	row := pg.db.QueryRow("SELECT * FROM junction21.public.tasks WHERE name=($1) AND user_id=($2)", taskName, userId)
 
 	var task model.Task
-	if err := row.Scan(&task.Id, &task.UserId, &task.Name, &task.Description, &task.EndDate, &task.StartDate, &task.Xp); err != nil {
+	if err := row.Scan(&task.Id, &task.UserId, &task.Name, &task.Xp, &task.Description, &task.StartDate, &task.EndDate); err != nil {
 		return model.Task{}, nil
 	}
 
