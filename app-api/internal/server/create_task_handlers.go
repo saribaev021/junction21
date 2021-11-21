@@ -95,7 +95,7 @@ func (s *Server) getTasksHandler(writer http.ResponseWriter, request *http.Reque
 
 	tasks, err := s.dbHandler.GetUserTasks(userId)
 	if err != nil {
-		s.errorLog(writer, fmt.Sprintf("db error: %s", err.Error()), http.StatusBadRequest)
+		s.errorLog(writer, fmt.Sprintf("db GetUserTasks error: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 
