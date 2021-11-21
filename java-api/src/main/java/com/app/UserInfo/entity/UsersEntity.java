@@ -11,16 +11,14 @@ public class UsersEntity {
     private Integer id;
     private String name;
     private int xp;
-    private byte[] photo;
 
     public UsersEntity() {
     }
 
-    public UsersEntity(Integer id, String name, int xp, byte[] photo) {
+    public UsersEntity(Integer id, String name, int xp) {
         this.id = id;
         this.name = name;
         this.xp = xp;
-        this.photo = photo;
     }
 
     public Integer getId() {
@@ -47,21 +45,12 @@ public class UsersEntity {
         this.xp = xp;
     }
 
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
-
     @Override
     public String toString() {
         return "UserEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", xp=" + xp +
-                ", photo=" + Arrays.toString(photo) +
                 '}';
     }
 }
