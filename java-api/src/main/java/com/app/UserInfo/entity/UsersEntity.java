@@ -10,16 +10,16 @@ public class UsersEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-    private double rating;
+    private int xp;
     private byte[] photo;
 
     public UsersEntity() {
     }
 
-    public UsersEntity(Integer id, String name, double rating, byte[] photo) {
+    public UsersEntity(Integer id, String name, int xp, byte[] photo) {
         this.id = id;
         this.name = name;
-        this.rating = rating;
+        this.xp = xp;
         this.photo = photo;
     }
 
@@ -39,12 +39,12 @@ public class UsersEntity {
         this.name = name;
     }
 
-    public double getRating() {
-        return rating;
+    public int getXp() {
+        return xp;
     }
 
-    public void setRating(double rating) {
-        this.rating = rating;
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 
     public byte[] getPhoto() {
@@ -60,7 +60,7 @@ public class UsersEntity {
         return "UserEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", rating=" + rating +
+                ", xp=" + xp +
                 ", photo=" + Arrays.toString(photo) +
                 '}';
     }
