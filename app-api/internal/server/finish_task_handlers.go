@@ -21,6 +21,8 @@ func (s *Server) deleteFinishedTask(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
+	log.Printf("incoming data: %v", taskData)
+
 	user, err := s.dbHandler.GetUserByName(taskData.UserName)
 	if err != nil {
 		s.errorLog(writer, fmt.Sprintf("database GetUserByName error: %s", err.Error()), http.StatusInternalServerError)
@@ -51,7 +53,7 @@ func (s *Server) deleteFinishedTask(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	log.Printf("incoming task: %v", taskData)
+	writer.Write([]byte("task deleted"))
 }
 
 func (s *Server) deleteTaskGiveUp(writer http.ResponseWriter, request *http.Request) {
@@ -62,6 +64,7 @@ func (s *Server) deleteTaskGiveUp(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
+	log.Printf("incoming task: %v", taskData)
 	userId, err := s.dbHandler.GetUserIdByName(taskData.UserName)
 	if err != nil {
 		s.errorLog(writer, fmt.Sprintf("database GetUserIdByName error: %s", err), http.StatusBadRequest)
@@ -73,5 +76,4 @@ func (s *Server) deleteTaskGiveUp(writer http.ResponseWriter, request *http.Requ
 		return
 	}
 
-	log.Printf("incoming task: %v", taskData)
 }

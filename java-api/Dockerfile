@@ -1,17 +1,5 @@
 
-
-
-#FROM golang:1.17 as connec
-#
-#COPY ./app-api/connect /connect
-#
-#WORKDIR /connect
-#
-#RUN go build -o /wait /connect/main.go
-
 FROM maven:3.8.3-jdk-11
-
-#COPY --from=connec /wait /wait
 
 COPY ./java-api/src /src
 
